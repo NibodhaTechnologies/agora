@@ -23,12 +23,13 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.spring.CamelRouteContextFactoryBean;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -42,8 +43,8 @@ public class RouteDefinitionsInjector implements ApplicationContextAware, CamelC
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RouteDefinitionsInjector.class);
 
-    @PropertyInject("camel.route.id.patterns")
-    private String routeIdPatternsToInject;
+    @Value("${camel.route.id.patterns}")
+    private String[] routeIdPatternsToInject;
 
     @Override
     public void setApplicationContext(final ApplicationContext applicationContext){
@@ -106,9 +107,9 @@ public class RouteDefinitionsInjector implements ApplicationContextAware, CamelC
                 }
                 continue;
             }
-            if(!routeDefinitionId.startsWith(routeIdPatternsToInject)) {
+            if(!StringUtils.startsWithAny(routeDefinitionId, routeIdPatternsToInject)) {
                 if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info("Rejecting route " + routeDefinitionId + "doesn't match the pattern "+ routeIdPatternsToInject);
+                    LOGGER.info("Rejecting route " + routeDefinitionId + "doesn't match any of the patterns "+ StringUtils.join(routeIdPatternsToInject, ","));
                 }
                 continue;
             }
