@@ -1,0 +1,62 @@
+<mapping-configuration xmlns="http://agora.nibodha.com/schema/transformation"
+                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                       xsi:schemaLocation="http://agora.nibodha.com/schema/transformation agora-transformation-config.xsd">
+    <mapping mapping-id="source-to-target">
+        <source>pojo://stream:com.nibodha.agora.services.objectmapper.SourceClass</source>
+        <destination>com.nibodha.agora.services.objectmapper.TargetClass</destination>
+        <field>
+            <source>name</source>
+            <destination>fullName</destination>
+        </field>
+        <field>
+            <source>age</source>
+            <destination>years</destination>
+        </field>
+        <field>
+            <constant-value>12</constant-value>
+            <destination>years</destination>
+        </field>
+        <field mapping-id-ref="friends-to-colleagues">
+            <source>friends</source>
+            <destination>colleagues</destination>
+        </field>
+        <field mapping-id-ref="developer-to-engineer">
+            <source>developer</source>
+            <destination>engineer</destination>
+        </field>
+        <field>
+            <source>telephones</source>
+            <destination>mobiles</destination>
+        </field>
+    </mapping>
+
+    <mapping mapping-id="friends-to-colleagues">
+        <source>com.nibodha.dbs.transformer.objectmapper.SourceClass</source>
+        <destination>com.nibodha.dbs.transformer.objectmapper.TargetClass</destination>
+        <field>
+            <source>name</source>
+            <destination>fullName</destination>
+        </field>
+        <field>
+            <source>age</source>
+            <destination>years</destination>
+        </field>
+        <field custom-converter-ref="customTestTypeConverter">
+            <source>customSourceValue</source>
+            <destination>customTargetValue</destination>
+        </field>
+    </mapping>
+
+    <mapping mapping-id="developer-to-engineer">
+        <source>com.nibodha.dbs.transformer.objectmapper.TargetClass</source>
+        <destination>com.nibodha.dbs.transformer.objectmapper.SourceClass</destination>
+        <field>
+            <source>fullName</source>
+            <destination>name</destination>
+        </field>
+        <field>
+            <source>years</source>
+            <destination>age</destination>
+        </field>
+    </mapping>
+</mapping-configuration>

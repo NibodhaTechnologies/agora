@@ -1,0 +1,26 @@
+
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:context="http://www.springframework.org/schema/context"
+             xmlns="http://camel.apache.org/schema/spring"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <beans:bean id="objectToObjectMapper" class="com.nibodha.agora.services.objectmapper.AgoraObjectMapper">
+        <beans:property name="mappingFile" value="classpath:object-to-object-configuration.xml"/>
+    </beans:bean>
+
+    <beans:bean id="xlsToObjectMapper" class="com.nibodha.agora.services.objectmapper.AgoraObjectMapper">
+        <beans:property name="mappingFile" value="classpath:xls-to-object-configuration.xml"/>
+    </beans:bean>
+
+    <beans:bean id="xlsTransformer" class="com.nibodha.agora.services.re.components.transform.TransformEndPoint">
+        <beans:property name="objectMapper" ref="xlsToObjectMapper"/>
+    </beans:bean>
+
+    <beans:bean id="customTestTypeConverter" class="com.nibodha.agora.services.objectmapper.AgoraObjectMapperTest.MyTypeConverter"/>
+
+    <context:component-scan base-package="com.nibodha.agora.services.objectmapper"/>
+
+</beans:beans>
