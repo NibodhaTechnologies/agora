@@ -16,8 +16,12 @@
 
 package com.nibodha.agora.services.re.spring.spi;
 
+import com.nibodha.agora.services.cm.ConfigurationManagementPropertySource;
+import com.nibodha.agora.services.cm.ConfigurationManagementPropertySourceLocator;
 import com.nibodha.agora.yaml.YamlPropertiesLoader;
 import org.apache.camel.spring.spi.BridgePropertyPlaceholderConfigurer;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -26,10 +30,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * @author gibugeorge on 17/12/15.
@@ -43,22 +44,24 @@ public class PlatformPropertyPlaceholderConfigurer extends BridgePropertyPlaceho
     private String fileEncoding;
     private Resource[] locations;
     private Boolean ignoreResourceNotFound;
-    private YamlPropertiesLoader yamlPropertiesLoader;
+    private final YamlPropertiesLoader yamlPropertiesLoader;
     private Properties properties;
     private String fileNames;
+    private PropertySource<?> propertySource;
 
-
-    public PlatformPropertyPlaceholderConfigurer() throws IOException {
+    public PlatformPropertyPlaceholderConfigurer() {
         resourcePatternResolver = new PathMatchingResourcePatternResolver();
         yamlPropertiesLoader = new YamlPropertiesLoader();
         this.setFileEncoding("UTF-8");
+    }
 
+    public PlatformPropertyPlaceholderConfigurer(final PropertySource<?> propertySource) throws IOException {
+        this();
+        this.propertySource = propertySource;
     }
 
     public void setConfigFileLocation(final Resource configFileLocation) throws IOException {
         this.configFileLocation = configFileLocation;
-
-
     }
 
     public void setFileNames(final String fileNames) throws IOException {
@@ -84,6 +87,10 @@ public class PlatformPropertyPlaceholderConfigurer extends BridgePropertyPlaceho
 
     @Override
     public void loadProperties(final Properties props) throws IOException {
+        if (propertySource != null) {
+            final Map<String, String> configurationProps = ((ConfigurationManagementPropertySource) propertySource).getProperties();
+            props.putAll(configurationProps);
+        }
         if (this.locations != null) {
             for (final Resource location : this.locations) {
                 if (logger.isInfoEnabled()) {

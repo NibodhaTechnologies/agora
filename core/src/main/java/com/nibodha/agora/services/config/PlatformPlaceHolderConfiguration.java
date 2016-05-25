@@ -16,12 +16,21 @@
 
 package com.nibodha.agora.services.config;
 
+import com.nibodha.agora.services.cm.ConfigurationManagementPropertySource;
+import com.nibodha.agora.services.cm.ConfigurationManagementPropertySourceLocator;
 import com.nibodha.agora.services.re.spring.spi.PlatformPropertyPlaceholderConfigurer;
+import com.nibodha.agora.services.zookeeper.config.ZookeeperConfiguration;
+import org.infinispan.factories.annotations.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -33,15 +42,25 @@ import java.io.IOException;
  */
 @Configuration
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
+@AutoConfigureAfter(ZookeeperConfiguration.class)
 public class PlatformPlaceHolderConfiguration implements ResourceLoaderAware {
 
     private ResourceLoader resourceLoader;
 
+    @Autowired(required = false)
+    private ConfigurationManagementPropertySourceLocator configurationManagementPropertySourceLocator;
+
     @Bean
-    public PlatformPropertyPlaceholderConfigurer platformPropertyPlaceholderConfigurer() throws IOException {
+    public PlatformPropertyPlaceholderConfigurer platformPropertyPlaceholderConfigurer(final Environment environment) throws IOException {
 
         final Resource configLocation = resourceLoader.getResource(System.getProperty("config.location"));
-        final PlatformPropertyPlaceholderConfigurer platformPropertyPlaceholderConfigurer = new PlatformPropertyPlaceholderConfigurer();
+        PlatformPropertyPlaceholderConfigurer platformPropertyPlaceholderConfigurer = null;
+        if (configurationManagementPropertySourceLocator != null) {
+            final PropertySource<?> propertySource = configurationManagementPropertySourceLocator.locate(environment);
+            platformPropertyPlaceholderConfigurer = new PlatformPropertyPlaceholderConfigurer(propertySource);
+        } else {
+            platformPropertyPlaceholderConfigurer = new PlatformPropertyPlaceholderConfigurer();
+        }
         platformPropertyPlaceholderConfigurer.setConfigFileLocation(configLocation);
         platformPropertyPlaceholderConfigurer.setFileEncoding("UTF-8");
         platformPropertyPlaceholderConfigurer.setIgnoreResourceNotFound(true);
