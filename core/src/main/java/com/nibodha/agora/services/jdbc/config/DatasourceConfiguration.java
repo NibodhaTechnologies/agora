@@ -22,7 +22,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
@@ -40,24 +39,24 @@ public class DatasourceConfiguration implements BeanDefinitionRegistryPostProces
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatasourceConfiguration.class);
 
-    private final boolean isDataSourceEnabled;
+    private final boolean dataSourceEnabled;
 
     private final Environment environment;
 
 
     public DatasourceConfiguration(final Environment environment) {
         this.environment = environment;
-        isDataSourceEnabled = Boolean.parseBoolean(environment.getProperty("platform.jdbc.datasource.enabled"));
+        dataSourceEnabled = Boolean.parseBoolean(environment.getProperty("platform.jdbc.datasource.enabled"));
     }
 
     public boolean dataSourceConfiguration(final BeanDefinitionRegistry beanDefinitionRegistry) {
 
-        if (!isDataSourceEnabled && LOGGER.isInfoEnabled()) {
+        if (!dataSourceEnabled && LOGGER.isInfoEnabled()) {
             LOGGER.info("Platform datasource is disabled");
             return false;
         }
         String[] dataSourceNames = getDsNames();
-        if (isDataSourceEnabled) {
+        if (dataSourceEnabled) {
             for (String dataSourceName : dataSourceNames) {
                 if (LOGGER.isInfoEnabled()) {
                     LOGGER.info("Configuring datasource with name {}", dataSourceName);

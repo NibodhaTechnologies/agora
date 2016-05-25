@@ -8,4 +8,9 @@ com.nibodha.agora.services.cache.config.CacheConfiguration,\
 com.nibodha.agora.services.cxf.config.CxfServeletConfiguration,\
 com.nibodha.agora.services.security.config.PlatformSecurityConfiguration,\
 com.nibodha.agora.services.jolokia.config.JolokiaConfiguration,\
-com.nibodha.agora.services.mvc.config.MvcConfiguration
+com.nibodha.agora.services.mvc.config.MvcConfiguration,\
+com.nibodha.agora.services.cm.config.ConfigurationManagementConfiguration
+
+org.springframework.cloud.bootstrap.BootstrapConfiguration=\
+com.nibodha.agora.services.config.AgoraBootstrapConfiguration
+
