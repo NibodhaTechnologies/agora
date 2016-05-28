@@ -6,6 +6,7 @@ package com.nibodha.agora.services.cm.config;
 
 import com.nibodha.agora.services.cm.ConfigurationManagementProperties;
 import com.nibodha.agora.services.cm.ConfigurationManagementPropertySourceLocator;
+import com.nibodha.agora.services.cm.ConfigurationWatcher;
 import org.apache.curator.framework.CuratorFramework;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -17,12 +18,16 @@ import org.springframework.context.annotation.Configuration;
  * @version 1.0
  */
 @Configuration
-@ConditionalOnProperty(prefix = "agora.configuration-management", value = "enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "agora.zookeeper", value = "enabled", havingValue = "true", matchIfMissing = false)
 @EnableConfigurationProperties(ConfigurationManagementProperties.class)
 public class ConfigurationManagementConfiguration {
 
+
     @Bean
+    @ConditionalOnProperty(prefix = "agora.configuration-management", value = "enabled", havingValue = "true", matchIfMissing = false)
     public ConfigurationManagementPropertySourceLocator configurationManagementPropertySourceLocator(final CuratorFramework curatorFramework, final ConfigurationManagementProperties configurationManagementProperties) {
         return new ConfigurationManagementPropertySourceLocator(curatorFramework, configurationManagementProperties);
     }
+
+
 }

@@ -9,8 +9,9 @@ com.nibodha.agora.services.cxf.config.CxfServeletConfiguration,\
 com.nibodha.agora.services.security.config.PlatformSecurityConfiguration,\
 com.nibodha.agora.services.jolokia.config.JolokiaConfiguration,\
 com.nibodha.agora.services.mvc.config.MvcConfiguration,\
-com.nibodha.agora.services.cm.config.ConfigurationManagementConfiguration
+com.nibodha.agora.services.cm.config.ConfigurationWatcherConfiguration
 
 org.springframework.cloud.bootstrap.BootstrapConfiguration=\
-com.nibodha.agora.services.config.AgoraBootstrapConfiguration
+com.nibodha.agora.services.zookeeper.config.ZookeeperConfiguration,\
+com.nibodha.agora.services.cm.config.ConfigurationManagementConfiguration
 
