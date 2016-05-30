@@ -7,6 +7,7 @@ package com.nibodha.agora.launcher;
 import com.nibodha.agora.env.PlatformEnvironment;
 import com.nibodha.agora.services.file.AbstractDirectoryWatcher;
 import com.nibodha.agora.services.jdbc.config.DatasourceConfiguration;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -27,11 +28,13 @@ import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.util.StringUtils;
 
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
 
 /**
  * Created by gibugeorge on 28/11/15.
@@ -50,7 +53,8 @@ public class PlatformLauncher {
     public static void main(final String[] args) {
 
         printSystemProperties();
-        new PlatformLauncher().run(args);
+        final PlatformLauncher launcher = new PlatformLauncher();
+        launcher.run(args);
 
     }
 
@@ -67,19 +71,8 @@ public class PlatformLauncher {
     }
 
     public void run(final String[] args) {
-        final SpringApplication application = new SpringApplication(PlatformLauncher.class);
-        final ConfigurableEnvironment environment = new PlatformEnvironment();
 
-        application.setEnvironment(environment);
-        application.addInitializers(new ApplicationContextInitializer<ConfigurableApplicationContext>() {
-            @Override
-            public void initialize(final ConfigurableApplicationContext applicationContext) {
-                applicationContext.addBeanFactoryPostProcessor(new DatasourceConfiguration(applicationContext.getEnvironment()));
-            }
-        });
-        application.setRegisterShutdownHook(true);
-        application.setWebEnvironment(true);
-        application.setLogStartupInfo(true);
+        final SpringApplication application = createSpringApplication(new PlatformEnvironment());
         final ConfigurableApplicationContext configurableApplicationContext = application.run(args);
         final Map<String, AbstractDirectoryWatcher> directoryWatchers = configurableApplicationContext.getBeansOfType(AbstractDirectoryWatcher.class);
         final Set<String> keySet = directoryWatchers.keySet();
@@ -91,5 +84,42 @@ public class PlatformLauncher {
 
     }
 
+    private SpringApplication createSpringApplication(final ConfigurableEnvironment environment) {
+        final SpringApplication application = new SpringApplication(PlatformLauncher.class);
+        application.setEnvironment(environment);
+        setContextClassLoader(environment.getProperty("agora.loader.path"));
+        application.addInitializers(new ApplicationContextInitializer<ConfigurableApplicationContext>() {
+            @Override
+            public void initialize(final ConfigurableApplicationContext applicationContext) {
+                applicationContext.addBeanFactoryPostProcessor(new DatasourceConfiguration(applicationContext.getEnvironment()));
+            }
+        });
+        application.setRegisterShutdownHook(true);
+        application.setWebEnvironment(true);
+        application.setLogStartupInfo(true);
+        return application;
+    }
+
+    private void setContextClassLoader(final String agoraLoaderPath) {
+        if (StringUtils.isEmpty(agoraLoaderPath)) {
+            return;
+        }
+        final File loaderDir = new File(agoraLoaderPath);
+        if (loaderDir.exists() && loaderDir.isDirectory()) {
+            final Collection<File> listOfFiles = FileUtils.listFiles(loaderDir, new String[]{"jar"}, false);
+            final URLClassLoader contextClassLoader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
+            final URL[] urls = contextClassLoader.getURLs();
+            final List<URL> urlList = new ArrayList<>(Arrays.asList(urls));
+            for (final File file : listOfFiles) {
+                try {
+                    urlList.add(file.toURI().toURL());
+                } catch (MalformedURLException e) {
+                    LOGGER.error("Error getting url", e);
+                }
+            }
+            final URL[] newUrls = new URL[urlList.size()];
+            Thread.currentThread().setContextClassLoader(new URLClassLoader(urlList.toArray(newUrls), contextClassLoader));
+        }
+    }
 
 }
