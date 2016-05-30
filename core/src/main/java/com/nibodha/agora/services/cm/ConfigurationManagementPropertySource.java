@@ -1,15 +1,29 @@
 /*
- * Copyright (c) Nibodha Technologies Pvt. Ltd. 2016. All rights reserved.  http://www.nibodha.com
+ * Copyright 2016 Nibodha Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.nibodha.agora.services.cm;
 
+import com.nibodha.agora.exceptions.PlatformRuntimeException;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.KeeperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.EnumerablePropertySource;
-import org.springframework.util.ReflectionUtils;
 
 import java.nio.charset.Charset;
 import java.util.*;
@@ -45,32 +59,46 @@ public class ConfigurationManagementPropertySource extends EnumerablePropertySou
 
     private void loadProperties(final String context) {
         try {
-            LOGGER.info("entering findProperties for path: {}", context);
-            List<String> children = null;
-            try {
-                children = this.getSource().getChildren().forPath(context);
-            } catch (KeeperException e) {
-                if (e.code() != KeeperException.Code.NONODE) { // not found
-                    throw e;
-                }
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("entering findProperties for path: {}", context);
             }
-            if (children == null || children.isEmpty()) {
+            final List<String> children = getChildren(context);
+            if (CollectionUtils.isEmpty(children)) {
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("no properties for path: {}", context);
+                }
                 return;
             }
-            for (String child : children) {
+            for (final String child : children) {
                 String childPath = context + "/" + child;
                 byte[] bytes = getPropertyBytes(childPath);
-                if (bytes == null || bytes.length == 0) {
+                if (ArrayUtils.isEmpty(bytes)) {
                     loadProperties(childPath);
                 } else {
-                    String key = sanitizeKey(childPath);
+                    final String key = sanitizeKey(childPath);
                     this.properties.put(key, new String(bytes, Charset.forName("UTF-8")));
                 }
             }
-            LOGGER.info("leaving findProperties for path: {}", context);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("leaving findProperties for path: {}", context);
+            }
         } catch (Exception exception) {
-            ReflectionUtils.rethrowRuntimeException(exception);
+            throw new PlatformRuntimeException("Exception while loading properties from zookeeper", exception);
         }
+    }
+
+    private List<String> getChildren(final String context) {
+        List<String> children = null;
+        try {
+            children = this.getSource().getChildren().forPath(context);
+        } catch (KeeperException e) {
+            if (e.code() != KeeperException.Code.NONODE) { // not found
+                throw new PlatformRuntimeException("Exception getting children for path " + context, e);
+            }
+        } catch (Exception e) {
+            throw new PlatformRuntimeException("Exception getting children for path " + context, e);
+        }
+        return children;
     }
 
     public Map<String, String> getProperties() {
@@ -78,20 +106,17 @@ public class ConfigurationManagementPropertySource extends EnumerablePropertySou
     }
 
     private byte[] getPropertyBytes(String fullPath) {
+        byte[] bytes = null;
         try {
-            byte[] bytes = null;
-            try {
-                bytes = this.getSource().getData().forPath(fullPath);
-            } catch (KeeperException e) {
-                if (e.code() != KeeperException.Code.NONODE) { // not found
-                    throw e;
-                }
+            bytes = this.getSource().getData().forPath(fullPath);
+        } catch (KeeperException e) {
+            if (e.code() != KeeperException.Code.NONODE) { // not found
+                throw new PlatformRuntimeException("Exception getting data from path " + fullPath, e);
             }
-            return bytes;
-        } catch (Exception exception) {
-            ReflectionUtils.rethrowRuntimeException(exception);
+        } catch (Exception e) {
+            throw new PlatformRuntimeException("Exception getting data from path " + fullPath, e);
         }
-        return null;
+        return bytes;
     }
 
     private String sanitizeKey(String path) {

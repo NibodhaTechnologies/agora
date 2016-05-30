@@ -18,7 +18,6 @@ package com.nibodha.agora.services.re;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
-import org.apache.camel.PropertyInject;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.spring.CamelRouteContextFactoryBean;
