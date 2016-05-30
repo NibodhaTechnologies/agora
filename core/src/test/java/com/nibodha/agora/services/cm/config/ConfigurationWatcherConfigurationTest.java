@@ -10,6 +10,7 @@ import com.nibodha.agora.services.cm.ConfigurationWatcher;
 import com.nibodha.agora.services.zookeeper.ZookeeperProperties;
 import com.nibodha.agora.services.zookeeper.config.ZookeeperConfiguration;
 import net.jcip.annotations.NotThreadSafe;
+import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.test.TestingServer;
 import org.junit.After;
 import org.junit.Assert;
@@ -47,6 +48,7 @@ public class ConfigurationWatcherConfigurationTest {
     private ConfigurationWatcher configurationWatcher;
 
 
+
     @Test
     public void testConfigurationWatcher() {
         Assert.assertNotNull(configurationWatcher);
@@ -57,9 +59,13 @@ public class ConfigurationWatcherConfigurationTest {
     public static class TestConfig {
         @Autowired
         private ConfigurationManagementPropertySourceLocator locator;
+        @Inject
+        private CuratorFramework curatorFramework;
+
 
         @Bean
-        public boolean locatePropertySource() {
+        public boolean locatePropertySource() throws Exception {
+            curatorFramework.create().creatingParentsIfNeeded().forPath("/config/agora/local/test", "test".getBytes());
             locator.locate(new PlatformEnvironment());
             return true;
         }

@@ -43,7 +43,7 @@ public class ConfigurationManagementPropertySourceLocatorTest {
     private ConfigurationManagementProperties properties;
 
     private CuratorFramework curator;
-    ;
+
 
     @BeforeClass
     public static void preSetup() {

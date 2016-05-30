@@ -18,6 +18,7 @@ package com.nibodha.agora.services.cm;
 
 import com.nibodha.agora.exceptions.PlatformRuntimeException;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.KeeperException;
 import org.slf4j.Logger;
@@ -71,10 +72,10 @@ public class ConfigurationManagementPropertySource extends EnumerablePropertySou
             for (final String child : children) {
                 String childPath = context + "/" + child;
                 byte[] bytes = getPropertyBytes(childPath);
-                if (bytes == null || bytes.length == 0) {
+                if (ArrayUtils.isEmpty(bytes)) {
                     loadProperties(childPath);
                 } else {
-                    String key = sanitizeKey(childPath);
+                    final String key = sanitizeKey(childPath);
                     this.properties.put(key, new String(bytes, Charset.forName("UTF-8")));
                 }
             }
@@ -106,12 +107,6 @@ public class ConfigurationManagementPropertySource extends EnumerablePropertySou
 
     private byte[] getPropertyBytes(String fullPath) {
         byte[] bytes = null;
-        bytes = getBytes(fullPath, bytes);
-        return bytes;
-
-    }
-
-    private byte[] getBytes(String fullPath, byte[] bytes) {
         try {
             bytes = this.getSource().getData().forPath(fullPath);
         } catch (KeeperException e) {
