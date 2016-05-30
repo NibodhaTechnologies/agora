@@ -16,12 +16,13 @@
 
 package com.nibodha.agora.services.cm;
 
+import com.nibodha.agora.exceptions.PlatformRuntimeException;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.KeeperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.EnumerablePropertySource;
-import org.springframework.util.ReflectionUtils;
 
 import java.nio.charset.Charset;
 import java.util.*;
@@ -57,19 +58,17 @@ public class ConfigurationManagementPropertySource extends EnumerablePropertySou
 
     private void loadProperties(final String context) {
         try {
-            LOGGER.info("entering findProperties for path: {}", context);
-            List<String> children = null;
-            try {
-                children = this.getSource().getChildren().forPath(context);
-            } catch (KeeperException e) {
-                if (e.code() != KeeperException.Code.NONODE) { // not found
-                    throw e;
-                }
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("entering findProperties for path: {}", context);
             }
-            if (children == null || children.isEmpty()) {
+            final List<String> children = getChildren(context);
+            if (CollectionUtils.isEmpty(children)) {
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("no properties for path: {}", context);
+                }
                 return;
             }
-            for (String child : children) {
+            for (final String child : children) {
                 String childPath = context + "/" + child;
                 byte[] bytes = getPropertyBytes(childPath);
                 if (bytes == null || bytes.length == 0) {
@@ -79,10 +78,26 @@ public class ConfigurationManagementPropertySource extends EnumerablePropertySou
                     this.properties.put(key, new String(bytes, Charset.forName("UTF-8")));
                 }
             }
-            LOGGER.info("leaving findProperties for path: {}", context);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("leaving findProperties for path: {}", context);
+            }
         } catch (Exception exception) {
-            ReflectionUtils.rethrowRuntimeException(exception);
+            throw new PlatformRuntimeException("Exception while loading properties from zookeeper", exception);
         }
+    }
+
+    private List<String> getChildren(final String context) {
+        List<String> children = null;
+        try {
+            children = this.getSource().getChildren().forPath(context);
+        } catch (KeeperException e) {
+            if (e.code() != KeeperException.Code.NONODE) { // not found
+                throw new PlatformRuntimeException("Exception getting children for path " + context, e);
+            }
+        } catch (Exception e) {
+            throw new PlatformRuntimeException("Exception getting children for path " + context, e);
+        }
+        return children;
     }
 
     public Map<String, String> getProperties() {
@@ -90,20 +105,23 @@ public class ConfigurationManagementPropertySource extends EnumerablePropertySou
     }
 
     private byte[] getPropertyBytes(String fullPath) {
+        byte[] bytes = null;
+        bytes = getBytes(fullPath, bytes);
+        return bytes;
+
+    }
+
+    private byte[] getBytes(String fullPath, byte[] bytes) {
         try {
-            byte[] bytes = null;
-            try {
-                bytes = this.getSource().getData().forPath(fullPath);
-            } catch (KeeperException e) {
-                if (e.code() != KeeperException.Code.NONODE) { // not found
-                    throw e;
-                }
+            bytes = this.getSource().getData().forPath(fullPath);
+        } catch (KeeperException e) {
+            if (e.code() != KeeperException.Code.NONODE) { // not found
+                throw new PlatformRuntimeException("Exception getting data from path " + fullPath, e);
             }
-            return bytes;
-        } catch (Exception exception) {
-            ReflectionUtils.rethrowRuntimeException(exception);
+        } catch (Exception e) {
+            throw new PlatformRuntimeException("Exception getting data from path " + fullPath, e);
         }
-        return null;
+        return bytes;
     }
 
     private String sanitizeKey(String path) {
