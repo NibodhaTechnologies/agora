@@ -8,5 +8,3 @@
 |I|n|t|e|g|r|a|t|i|o|n| |P|l|a|t|f|o|r|m|
 +-+-+-+-+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
          ${application.formatted-version}
-
-
