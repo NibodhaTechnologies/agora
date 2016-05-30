@@ -7,11 +7,14 @@ package com.nibodha.agora.services.cm.config;
 import com.nibodha.agora.env.PlatformEnvironment;
 import com.nibodha.agora.services.cm.ConfigurationManagementPropertySourceLocator;
 import com.nibodha.agora.services.cm.ConfigurationWatcher;
+import com.nibodha.agora.services.zookeeper.ZookeeperProperties;
 import com.nibodha.agora.services.zookeeper.config.ZookeeperConfiguration;
-import com.nibodha.agora.services.zookeeper.config.ZookeeperTestConfiguration;
 import net.jcip.annotations.NotThreadSafe;
 import org.apache.curator.test.TestingServer;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +25,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author gibugeorge on 28/05/16.
@@ -42,9 +46,6 @@ public class ConfigurationWatcherConfigurationTest {
     @Autowired(required = false)
     private ConfigurationWatcher configurationWatcher;
 
-    @Inject
-    private TestingServer testingServer;
-
 
     @Test
     public void testConfigurationWatcher() {
@@ -52,7 +53,7 @@ public class ConfigurationWatcherConfigurationTest {
 
     }
 
-    @Import({ZookeeperTestConfiguration.class, ZookeeperConfiguration.class, ConfigurationManagementConfiguration.class})
+    @Import({ZookeeperConfiguration.class, ConfigurationManagementConfiguration.class})
     public static class TestConfig {
         @Autowired
         private ConfigurationManagementPropertySourceLocator locator;
@@ -62,11 +63,26 @@ public class ConfigurationWatcherConfigurationTest {
             locator.locate(new PlatformEnvironment());
             return true;
         }
+
+        @Bean
+        public TestingServer testingServer() throws Exception {
+            return new TestingServer(2183, true);
+        }
+
+        @Bean
+        public ZookeeperProperties zookeeperProperties() {
+            final ZookeeperProperties zookeeperProperties = new ZookeeperProperties();
+            zookeeperProperties.setConnectString("localhost:2183");
+            zookeeperProperties.setEnabled(true);
+            zookeeperProperties.setMaxRetries(2);
+            zookeeperProperties.setMaxSleepMs(500);
+            zookeeperProperties.setBaseSleepTimeMs(50);
+            zookeeperProperties.setBlockUntilConnectedUnit(TimeUnit.SECONDS);
+            zookeeperProperties.setBlockUntilConnectedWait(5);
+            return zookeeperProperties;
+        }
     }
 
-    @After
-    public void tearDown() throws IOException {
-        testingServer.close();
-    }
+
 
 }
