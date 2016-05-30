@@ -81,6 +81,7 @@
         <logstash-logback-encoder.version>4.6</logstash-logback-encoder.version>
         <spark.version>1.6.1</spark.version>
         <curator.version>2.10.0</curator.version>
+        <poi.version>3.14</poi.version>
     </properties>
     <developers>
         <developer>
@@ -420,6 +421,16 @@
                 <version>Brixton.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
