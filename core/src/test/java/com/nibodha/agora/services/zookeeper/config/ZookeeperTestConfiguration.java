@@ -4,6 +4,7 @@
 
 package com.nibodha.agora.services.zookeeper.config;
 
+import com.nibodha.agora.services.zookeeper.ZookeeperProperties;
 import org.apache.curator.test.TestingServer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,13 @@ import org.springframework.context.annotation.Configuration;
 public class ZookeeperTestConfiguration {
     @Bean
     public TestingServer testingServer() throws Exception {
-        return new TestingServer();
+        return new TestingServer(true);
+    }
+
+    @Bean
+    public ZookeeperProperties zookeeperProperties(final TestingServer testingServer) {
+        final ZookeeperProperties zookeeperProperties = new ZookeeperProperties();
+        zookeeperProperties.setConnectString(testingServer.getConnectString());
+        return zookeeperProperties;
     }
 }
