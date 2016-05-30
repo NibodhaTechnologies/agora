@@ -45,6 +45,9 @@ public class XlsToPojoTransformer implements Transformer<File, List<Object>> {
             final Object rowObj = transformRowCells(row, mappingConfig, columnHeaders);
             destination.add(rowObj);
         }
+
+        workbook.close();
+
         return destination;
     }
 
