@@ -16,10 +16,13 @@
 
 package com.nibodha.agora.services.re.spring.spi;
 
+import com.nibodha.agora.env.PlatformEnvironment;
 import com.nibodha.agora.services.cm.ConfigurationManagementPropertySource;
 import com.nibodha.agora.services.cm.ConfigurationManagementPropertySourceLocator;
 import com.nibodha.agora.yaml.YamlPropertiesLoader;
 import org.apache.camel.spring.spi.BridgePropertyPlaceholderConfigurer;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.core.env.CompositePropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.Resource;
@@ -31,6 +34,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * @author gibugeorge on 17/12/15.
@@ -47,18 +51,15 @@ public class PlatformPropertyPlaceholderConfigurer extends BridgePropertyPlaceho
     private final YamlPropertiesLoader yamlPropertiesLoader;
     private Properties properties;
     private String fileNames;
-    private PropertySource<?> propertySource;
+    private final Environment environment;
 
-    public PlatformPropertyPlaceholderConfigurer() {
+    public PlatformPropertyPlaceholderConfigurer(final Environment environment) {
         resourcePatternResolver = new PathMatchingResourcePatternResolver();
         yamlPropertiesLoader = new YamlPropertiesLoader();
         this.setFileEncoding("UTF-8");
+        this.environment = environment;
     }
 
-    public PlatformPropertyPlaceholderConfigurer(final PropertySource<?> propertySource) throws IOException {
-        this();
-        this.propertySource = propertySource;
-    }
 
     public void setConfigFileLocation(final Resource configFileLocation) throws IOException {
         this.configFileLocation = configFileLocation;
@@ -87,10 +88,7 @@ public class PlatformPropertyPlaceholderConfigurer extends BridgePropertyPlaceho
 
     @Override
     public void loadProperties(final Properties props) throws IOException {
-        if (propertySource != null) {
-            final Map<String, String> configurationProps = ((ConfigurationManagementPropertySource) propertySource).getProperties();
-            props.putAll(configurationProps);
-        }
+        loadBootstrapProperties(props);
         if (this.locations != null) {
             for (final Resource location : this.locations) {
                 if (logger.isInfoEnabled()) {
@@ -108,6 +106,22 @@ public class PlatformPropertyPlaceholderConfigurer extends BridgePropertyPlaceho
                         throw ex;
                     }
                 }
+            }
+        }
+    }
+
+    private void loadBootstrapProperties(Properties props) {
+        if (environment instanceof PlatformEnvironment) {
+            final PropertySource bootstrapProperties = ((PlatformEnvironment) environment).getPropertySources().get("bootstrapProperties");
+            if (bootstrapProperties instanceof CompositePropertySource) {
+                final Collection<PropertySource<?>> propertySources = ((CompositePropertySource) bootstrapProperties).getPropertySources();
+                if (CollectionUtils.isNotEmpty(propertySources)) {
+                    final PropertySource<?> propertySource = propertySources.iterator().next();
+                    if (propertySource instanceof ConfigurationManagementPropertySource) {
+                        props.putAll(((ConfigurationManagementPropertySource) propertySource).getProperties());
+                    }
+                }
+
             }
         }
     }

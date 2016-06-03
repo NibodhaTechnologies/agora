@@ -24,6 +24,7 @@
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
     <beans:bean id="bridgePropertyPlaceholder"
                 class="com.nibodha.agora.services.re.spring.spi.PlatformPropertyPlaceholderConfigurer">
+        <beans:constructor-arg name="environment" ref="environment"/>
         <beans:property name="configFileLocation" value="${config.location}"/>
         <beans:property name="fileNames" value="classpath:test-is.properties"/>
     </beans:bean>
