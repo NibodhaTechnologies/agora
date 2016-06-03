@@ -47,20 +47,12 @@ public class PlatformPlaceHolderConfiguration implements ResourceLoaderAware {
 
     private ResourceLoader resourceLoader;
 
-    @Autowired(required = false)
-    private ConfigurationManagementPropertySourceLocator configurationManagementPropertySourceLocator;
 
     @Bean
     public PlatformPropertyPlaceholderConfigurer platformPropertyPlaceholderConfigurer(final Environment environment) throws IOException {
 
         final Resource configLocation = resourceLoader.getResource(System.getProperty("config.location"));
-        PlatformPropertyPlaceholderConfigurer platformPropertyPlaceholderConfigurer = null;
-        if (configurationManagementPropertySourceLocator != null) {
-            final PropertySource<?> propertySource = configurationManagementPropertySourceLocator.locate(environment);
-            platformPropertyPlaceholderConfigurer = new PlatformPropertyPlaceholderConfigurer(propertySource);
-        } else {
-            platformPropertyPlaceholderConfigurer = new PlatformPropertyPlaceholderConfigurer();
-        }
+        PlatformPropertyPlaceholderConfigurer platformPropertyPlaceholderConfigurer = new PlatformPropertyPlaceholderConfigurer(environment);
         platformPropertyPlaceholderConfigurer.setConfigFileLocation(configLocation);
         platformPropertyPlaceholderConfigurer.setFileEncoding("UTF-8");
         platformPropertyPlaceholderConfigurer.setIgnoreResourceNotFound(true);
