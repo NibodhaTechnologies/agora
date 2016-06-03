@@ -5,6 +5,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.impl.DefaultComponent;
 import org.apache.camel.util.CamelContextHelper;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
@@ -19,9 +20,9 @@ public class TransformComponent extends DefaultComponent {
     @Override
     protected Endpoint createEndpoint(final String uri, final String remaining, final Map<String, Object> map) throws Exception {
         if (remaining.startsWith(BEAN_PREFIX)) {
-            String beanId = remaining.substring("bean:".length());
+            String beanId = StringUtils.substringAfter(remaining, "bean:");
             if (beanId.startsWith("//")) {
-                beanId = beanId.substring(2);
+                beanId = StringUtils.substringAfter(beanId, "//");
             }
             return CamelContextHelper.mandatoryLookup(getCamelContext(), beanId, TransformEndPoint.class);
         } else {
