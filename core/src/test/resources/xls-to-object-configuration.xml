@@ -7,30 +7,32 @@
         <data-start-row>1</data-start-row>
         <source>xls://stream:customer.xls</source>
         <destination>com.nibodha.agora.services.objectmapper.Customer</destination>
-        <field>
-            <source>Date</source>
-            <destination>date</destination>
-        </field>
-        <field>
-            <source>Price</source>
-            <destination>price</destination>
-        </field>
-        <field>
-            <source>Quantity</source>
-            <destination>quantity</destination>
-        </field>
-        <field>
-            <source>Total</source>
-            <destination>total</destination>
-        </field>
-        <field>
-            <source>Name</source>
-            <destination>name</destination>
-        </field>
-        <field>
-            <source>ID</source>
-            <destination>id</destination>
-        </field>
+        <fields>
+            <field>
+                <source>Date</source>
+                <destination>date</destination>
+            </field>
+            <field>
+                <source>Price</source>
+                <destination>price</destination>
+            </field>
+            <field>
+                <source>Quantity</source>
+                <destination>quantity</destination>
+            </field>
+            <field>
+                <source>Total</source>
+                <destination>total</destination>
+            </field>
+            <field>
+                <source>Name</source>
+                <destination>name</destination>
+            </field>
+            <field>
+                <source>ID</source>
+                <destination>id</destination>
+            </field>
+        </fields>
     </mapping>
     <mapping mapping-id="xls-to-map">
         <sheet>0</sheet>
