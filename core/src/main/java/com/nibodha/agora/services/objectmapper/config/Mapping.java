@@ -13,8 +13,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * <p>Java class for anonymous complex type.
@@ -57,7 +55,7 @@ import java.util.List;
         "dataStartRow",
         "source",
         "destination",
-        "field"
+        "fields"
 })
 public class Mapping {
 
@@ -71,7 +69,7 @@ public class Mapping {
     @XmlElement(required = true)
     protected String destination;
     @XmlElement(required = true)
-    protected List<Field> field;
+    protected Fields fields;
     @XmlAttribute(name = "mapping-id")
     protected String mappingId;
 
@@ -177,11 +175,8 @@ public class Mapping {
      * Objects of the following type(s) are allowed in the list
      * {@link Field }
      */
-    public List<Field> getField() {
-        if (field == null) {
-            field = new ArrayList<Field>();
-        }
-        return this.field;
+    public Fields getFields() {
+        return this.fields;
     }
 
     /**

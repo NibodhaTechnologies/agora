@@ -25,6 +25,7 @@
     <context:component-scan base-package="com.nibodha.agora.services.re"/>
     <context:component-scan base-package="com.nibodha.agora.processors"/>
     <context:component-scan base-package="com.nibodha.agora.services.cache"/>
+    <context:component-scan base-package="com.nibodha.agora.services.objectmapper"/>
 
     <beans:import resource="classpath*:META-INF/spring/batch/config/*.xml"/>
     <beans:import resource="classpath*:META-INF/spring/batch/jobs/*.xml"/>

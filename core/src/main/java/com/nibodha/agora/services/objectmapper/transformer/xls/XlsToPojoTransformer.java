@@ -55,7 +55,7 @@ public class XlsToPojoTransformer implements Transformer<File, List<Object>> {
         final Object result;
         final Map<String, Cell> cellValues = getCellValues(row, columnHeaders);
 
-        if (StringUtils.isNotBlank(mappingConfig.getDestination()) && mappingConfig.getField() != null) {
+        if (StringUtils.isNotBlank(mappingConfig.getDestination()) && mappingConfig.getFields() != null) {
             LOGGER.info("Xls to Pojo Conversion ::: Missing field mapping - converting to Map by default for {}", mappingConfig.getSource());
             result = transformRowToBean(mappingConfig, columnHeaders, cellValues);
         } else {
@@ -66,7 +66,7 @@ public class XlsToPojoTransformer implements Transformer<File, List<Object>> {
 
     private Object transformRowToBean(final Mapping mappingConfig, List<String> columnHeaders, final Map<String, Cell> cellValues) {
         final MapperObject rowObj = new MapperObject(ObjectUtils.newInstance(mappingConfig.getDestination()));
-        final List<Field> fieldMappings = mappingConfig.getField();
+        final List<Field> fieldMappings = mappingConfig.getFields().getField();
         fieldMappings.forEach(field -> {
             final Cell cell = cellValues.get(field.getSource());
             if (cell != null) {
