@@ -76,7 +76,10 @@ public class DatasourceConfiguration implements BeanDefinitionRegistryPostProces
                 if (StringUtils.isNotEmpty(driverClassName)) {
                     hikariConfig.setDriverClassName(driverClassName);
                 }
-                hikariConfig.setConnectionTestQuery("Select 1");
+                final String connectionTestQuery = getProperty("connection-test-query",dataSourceName);
+                if(StringUtils.isNotEmpty(connectionTestQuery)) {
+                    hikariConfig.setConnectionTestQuery(connectionTestQuery);
+                }
                 hikariConfig.addDataSourceProperty("cachePrepStmts", getProperty("cache-prep-stmts", dataSourceName));
                 hikariConfig.addDataSourceProperty("prepStmtCacheSize", getProperty("prep-stmt-cache-size", dataSourceName));
                 hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", getProperty("prep-stmt-cache-sql-limit", dataSourceName));
