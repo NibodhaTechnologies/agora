@@ -45,7 +45,7 @@ public class ObjectToObjectTransformer implements Transformer<Object, Object> {
         final MapperObject sourceObj = new MapperObject(source);
         final MapperObject destObj = new MapperObject(destination);
 
-        for (final Field field : mappingConfig.getField()) {
+        for (final Field field : mappingConfig.getFields().getField()) {
             final Class<?> fieldType = destObj.getFieldType(field.getDestination());
             final Object resultValue;
             if (field.getCustomConverterRef() != null) {
