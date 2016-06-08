@@ -13,6 +13,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +92,18 @@ public class AgoraObjectMapperTest {
         @Override
         public Object convert(final Object source, final Object parentObject) {
             return getParameter("Your Name");
+        }
+
+    }
+
+    public static class ThisToListConverter extends AbstractTypeConverter {
+
+        @Override
+        public Object convert(final Object source, final Object parentObject) {
+            final SourceClass result = new SourceClass();
+            result.setName(((SourceClass)source).getName());
+            result.setAge(((SourceClass)source).getAge());
+            return Arrays.asList(result);
         }
 
     }

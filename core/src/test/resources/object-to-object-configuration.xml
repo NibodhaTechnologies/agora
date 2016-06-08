@@ -1,6 +1,6 @@
 <mapping-configuration xmlns="http://agora.nibodha.com/schema/transformation"
                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                       xsi:schemaLocation="http://agora.nibodha.com/schema/transformation agora-transformation-config.xsd">
+                       xsi:schemaLocation="http://agora.nibodha.com/schema/transformation http://agora.nibodha.com/schema/transformation/agora-transformation-config.xsd">
     <mapping mapping-id="source-to-target">
         <source>pojo://stream:com.nibodha.agora.services.objectmapper.SourceClass</source>
         <destination>com.nibodha.agora.services.objectmapper.TargetClass</destination>
@@ -28,6 +28,10 @@
             <field>
                 <source>telephones</source>
                 <destination>mobiles</destination>
+            </field>
+            <field custom-converter-ref="customThisToListConverter">
+                <source>#this</source>
+                <destination>sources</destination>
             </field>
         </fields>
     </mapping>
