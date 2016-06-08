@@ -9,6 +9,7 @@ public class TargetClass {
     private ArrayList<TargetClass> colleagues;
     private SourceClass engineer;
     private String customTargetValue;
+    private List<SourceClass> sources;
 
     public List<Integer> getMobiles() {
         return mobiles;
@@ -69,6 +70,14 @@ public class TargetClass {
 
     public void setCustomTargetValue(final String customTargetValue) {
         this.customTargetValue = customTargetValue;
+    }
+
+    public List<SourceClass> getSources() {
+        return sources;
+    }
+
+    public void setSources(final List<SourceClass> sources) {
+        this.sources = sources;
     }
 }
 

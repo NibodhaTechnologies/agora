@@ -29,6 +29,10 @@
                 <source>telephones</source>
                 <destination>mobiles</destination>
             </field>
+            <field custom-converter-ref="customThisToListConverter">
+                <source>#this</source>
+                <destination>sources</destination>
+            </field>
         </fields>
     </mapping>
 
