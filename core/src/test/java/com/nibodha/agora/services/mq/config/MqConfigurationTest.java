@@ -16,6 +16,8 @@
 
 package com.nibodha.agora.services.mq.config;
 
+import org.apache.activemq.command.ActiveMQDestination;
+import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.activemq.xbean.BrokerFactoryBean;
 import org.junit.Assert;
@@ -51,6 +53,7 @@ public class MqConfigurationTest {
         final BrokerFactoryBean brokerFactoryBean = applicationContext.getBean(BrokerFactoryBean.class);
         Assert.assertEquals("mqBroker", brokerFactoryBean.getBroker().getBrokerName());
         Assert.assertEquals("vm://mqBroker", brokerFactoryBean.getBroker().getVmConnectorURI().toString());
+        Assert.assertEquals(2,applicationContext.getBeanNamesForType(ActiveMQQueue.class).length);
 
     }
 }
