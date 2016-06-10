@@ -40,15 +40,17 @@ public abstract class AbstractDirectoryWatcher implements Runnable, DirectoryWat
     protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractDirectoryWatcher.class);
     protected static final long DEFAULT_CHANGES_CHECK_INTERVAL_MS = 1000;
 
-    private final WatchService directoryWatcher;
-    private final URI directory;
+    private WatchService directoryWatcher;
+    private URI directory;
     private ScheduledExecutorService artifactDirMonitorTimer;
 
     public AbstractDirectoryWatcher(final URI directory) throws IOException {
-        directoryWatcher = FileSystems.getDefault().newWatchService();
-        this.directory = directory;
-        final Path configDir = Paths.get(directory);
-        configDir.register(directoryWatcher, ENTRY_CREATE, ENTRY_MODIFY);
+        if (directory != null) {
+            directoryWatcher = FileSystems.getDefault().newWatchService();
+            this.directory = directory;
+            final Path configDir = Paths.get(directory);
+            configDir.register(directoryWatcher, ENTRY_CREATE, ENTRY_MODIFY);
+        }
 
 
     }
