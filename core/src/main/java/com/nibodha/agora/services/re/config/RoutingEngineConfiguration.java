@@ -55,10 +55,6 @@ public class RoutingEngineConfiguration {
         return activeMQComponent;
     }
 
-    @Bean
-    public JmsTransactionManager jmsTransactionManager(final PooledConnectionFactory pooledConnectionFactory) {
-        return new JmsTransactionManager(pooledConnectionFactory);
-    }
 
     @Bean
     @ConditionalOnProperty(prefix = "platform.routingengine", value = "trace-enabled", havingValue = "true", matchIfMissing = false)

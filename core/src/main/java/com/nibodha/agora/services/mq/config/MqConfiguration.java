@@ -24,8 +24,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.connection.JmsTransactionManager;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -49,6 +52,9 @@ public class MqConfiguration {
     private MqProperties mqProperties;
 
     private static final String MQ_BROKER_NAME = "mqBroker";
+
+    @Inject
+    private ApplicationContext applicationContext;
 
 
     @Bean
@@ -98,6 +104,12 @@ public class MqConfiguration {
         return brokerService;
     }
 
+    @Bean
+    public JmsTransactionManager jmsTransactionManager(final PooledConnectionFactory pooledConnectionFactory) {
+        return new JmsTransactionManager(pooledConnectionFactory);
+    }
+
+
     private List<PolicyEntry> getPolicyEntries() {
         final PolicyEntry queuePolicy = new PolicyEntry();
         queuePolicy.setQueue(">");
@@ -122,7 +134,9 @@ public class MqConfiguration {
         if (StringUtils.isNotEmpty(mqProperties.getQueueNames())) {
             final String[] queueNames = mqProperties.getQueueNames().split(",");
             for (final String queueName : queueNames) {
-                destinations.add(new ActiveMQQueue(queueName));
+                final ActiveMQQueue queue = new ActiveMQQueue(queueName);
+                ((ConfigurableApplicationContext) applicationContext).getBeanFactory().registerSingleton(queueName, queue);
+                destinations.add(queue);
             }
         }
         return destinations;
@@ -133,7 +147,9 @@ public class MqConfiguration {
         if (StringUtils.isNotEmpty(mqProperties.getTopicNames())) {
             final String[] topicNames = mqProperties.getTopicNames().split(",");
             for (final String topicName : topicNames) {
-                destinations.add(new ActiveMQTopic(topicName));
+                final ActiveMQTopic topic = new ActiveMQTopic(topicName);
+                ((ConfigurableApplicationContext) applicationContext).getBeanFactory().registerSingleton(topicName, topic);
+                destinations.add(topic);
             }
         }
         return destinations;
