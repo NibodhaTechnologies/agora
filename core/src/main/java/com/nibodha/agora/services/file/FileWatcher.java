@@ -33,7 +33,7 @@ public class FileWatcher extends AbstractDirectoryWatcher {
     private String beanId;
 
     public FileWatcher(final Resource fileTobeWatched, final FileWatcherCallback fileWatcherCallback) throws IOException {
-        super(fileTobeWatched.getFile().getParentFile().toURI());
+        super(fileTobeWatched!=null?fileTobeWatched.getFile().getParentFile().toURI():null);
         this.fileTobeWatched = fileTobeWatched;
         this.fileWatcherCallback = fileWatcherCallback;
     }
