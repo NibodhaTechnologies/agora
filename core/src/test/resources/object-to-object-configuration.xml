@@ -37,8 +37,8 @@
     </mapping>
 
     <mapping mapping-id="friends-to-colleagues">
-        <source>com.nibodha.dbs.transformer.objectmapper.SourceClass</source>
-        <destination>com.nibodha.dbs.transformer.objectmapper.TargetClass</destination>
+        <source>com.nibodha.agora.services.objectmapper.SourceClass</source>
+        <destination>com.nibodha.agora.services.objectmapper.TargetClass</destination>
         <fields>
             <field>
                 <source>name</source>
@@ -56,8 +56,8 @@
     </mapping>
 
     <mapping mapping-id="developer-to-engineer">
-        <source>com.nibodha.dbs.transformer.objectmapper.TargetClass</source>
-        <destination>com.nibodha.dbs.transformer.objectmapper.SourceClass</destination>
+        <source>com.nibodha.agora.services.objectmapper.TargetClass</source>
+        <destination>com.nibodha.agora.services.objectmapper.SourceClass</destination>
         <fields>
             <field>
                 <source>fullName</source>
