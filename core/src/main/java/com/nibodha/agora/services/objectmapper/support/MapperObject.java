@@ -1,11 +1,11 @@
 package com.nibodha.agora.services.objectmapper.support;
 
+import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 public class MapperObject {
 
@@ -21,7 +21,7 @@ public class MapperObject {
 
     public MapperObject(final Object object) {
         this.object = object;
-        this.context = new StandardEvaluationContext(object);
+        this.context = new ObjectMapperEvaluationContext(object);
     }
 
     public void setValue(final String expression, final Object value) {
@@ -42,7 +42,8 @@ public class MapperObject {
 
     public Class<?> getFieldCollectionElementType(final String expression) {
         final Expression exp = PARSER.parseExpression(expression);
-        return exp.getValueTypeDescriptor(context).getElementTypeDescriptor().getType();
+        final TypeDescriptor elementTypeDescriptor = exp.getValueTypeDescriptor(context).getElementTypeDescriptor();
+        return elementTypeDescriptor != null ? elementTypeDescriptor.getType() : null;
     }
 
     public Object getObject() {
