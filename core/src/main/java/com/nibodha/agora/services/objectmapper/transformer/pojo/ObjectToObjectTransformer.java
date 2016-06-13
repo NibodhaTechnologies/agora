@@ -41,7 +41,7 @@ public class ObjectToObjectTransformer implements Transformer<Object, Object> {
         return ObjectUtils.newInstance(clazz);
     }
 
-    private Object transform(final Object source, final Object destination, final Mapping mappingConfig) {
+    private Object transform(final Object source, final Object destination, final Mapping mappingConfig) throws Exception {
         final MapperObject sourceObj = new MapperObject(source);
         final MapperObject destObj = new MapperObject(destination);
 
@@ -81,7 +81,7 @@ public class ObjectToObjectTransformer implements Transformer<Object, Object> {
         return resultValue;
     }
 
-    private Object transformObject(final MapperObject sourceObj, final MapperObject destinationObj, final Field field) {
+    private Object transformObject(final MapperObject sourceObj, final MapperObject destinationObj, final Field field) throws Exception {
         final Object sourceValue = sourceObj.getValue(field.getSource());
         Object destinationValue = destinationObj.getValue(field.getDestination());
         if (destinationValue == null) {
@@ -94,11 +94,11 @@ public class ObjectToObjectTransformer implements Transformer<Object, Object> {
         return transform(sourceValue, destinationValue, mappingConfig);
     }
 
-    private Object transformCollection(final MapperObject sourceObj, final MapperObject destinationObj, final Field field) {
+    private Object transformCollection(final MapperObject sourceObj, final MapperObject destinationObj, final Field field) throws Exception {
         final Object sourceValues = sourceObj.getValue(field.getSource());
         final Class<?> destCollectionElementType = destinationObj.getFieldCollectionElementType(field.getDestination());
 
-        if (BeanUtils.isSimpleProperty(destCollectionElementType)) {
+        if (destCollectionElementType != null && BeanUtils.isSimpleProperty(destCollectionElementType)) {
             return sourceValues;
         }
 
@@ -113,8 +113,7 @@ public class ObjectToObjectTransformer implements Transformer<Object, Object> {
 
         //noinspection unchecked
         for (final Object srcVal : (Collection<Object>) sourceValues) {//TODO: array to collection and vice versa support
-            final Object resultObject = ObjectUtils.newInstance(destCollectionElementType);
-            destinationValues.add(transform(srcVal, resultObject, mappingConfig));
+            destinationValues.add(transform(srcVal, mappingConfig));
         }
 
         return destinationValues;
